@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center gap-2;
+  }
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-secondary-700 border border-secondary-200 rounded-lg hover:bg-secondary-50 transition-colors font-medium flex items-center gap-2;
+  }
+}
