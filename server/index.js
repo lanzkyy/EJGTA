@@ -15,10 +15,12 @@ app.use('/uploads', express.static('uploads'));
 
 // Database Connection
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'ejgta'
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'ejgta',
+  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: true } : undefined,
 });
 
 db.connect((err) => {
@@ -26,7 +28,7 @@ db.connect((err) => {
     console.error('Error connecting to MySQL:', err);
     return;
   }
-  console.log('Connected to MySQL Database: ejgta');
+  console.log('Connected to MySQL Database');
   
   // Create Tables if not exist
   const usersTable = `
@@ -40,6 +42,7 @@ db.connect((err) => {
     )
   `;
   
+  // PlanetScale tidak mendukung Foreign Key; untuk kompatibilitas, kita hilangkan FK constraint.
   const submissionsTable = `
     CREATE TABLE IF NOT EXISTS submissions (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -49,8 +52,7 @@ db.connect((err) => {
       article_type VARCHAR(100),
       file_path VARCHAR(255),
       status ENUM('pending', 'under_review', 'accepted', 'rejected') DEFAULT 'pending',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id)
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `;
 
@@ -163,6 +165,6 @@ app.get('/api/submissions/:userId', (req, res) => {
 });
 
 const PORT = 5000;
-app.listen(PORT, () => {
+app.listen(process.env.PORT || PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
